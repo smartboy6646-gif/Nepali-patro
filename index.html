@@ -59,7 +59,7 @@
 <div class="app-container">
     <div class="top-header">
         <div class="logo-section">
-            <img src="logo.png" alt="App Logo" class="logo" onerror="this.src='https://via.placeholder.com/45/4A25E1/FFFFFF?text=Logo'">
+            <img src="https://via.placeholder.com/45/4A25E1/FFFFFF?text=Logo" alt="App Logo" class="logo" onerror="this.src='https://via.placeholder.com/45/4A25E1/FFFFFF?text=Logo'">
             <h1 class="today-date">आजको मिति: कात्तिक २२, २०८३</h1>
         </div>
         <div class="today-eng">November 8, 2026</div>
@@ -68,8 +68,8 @@
     <div class="month-nav">
         <button class="btn-nav" onclick="changeMonth(-1)">« अघिल्लो</button>
         <div class="month-title">
-            <h2 id="monthTitle">कात्तिक, २०८३</h2>
-            <span id="monthEngTitle">Oct / Nov</span>
+            <h2 id="monthTitle">वैशाख, २०८४</h2>
+            <span id="monthEngTitle">Apr/May</span>
         </div>
         <button class="btn-nav" onclick="changeMonth(1)">अर्को »</button>
     </div>
@@ -79,7 +79,7 @@
     </div>
 
     <div class="action-section">
-        <button class="btn-export" onclick="downloadUpdatedCode()">💾 Save & Get Code</button>
+        <button class="btn-export" onclick="downloadUpdatedCode()">💾 Save &amp; Get Code</button>
         <span class="help-text">तिथि परिवर्तन गरेपछि यो बटन थिच्नुहोस्। यसले नयाँ तिथि सेभ भएको कोड फाइल डाउनलोड गर्छ, जुन अरुलाई पठाउन मिल्छ।</span>
     </div>
 </div>
@@ -108,10 +108,18 @@
 
     /* DATA_START */
     let tithiData = {
-        "2083-7-4": "Ekadashi",
-        "2083-7-15": "Ashtami",
-        "2083-7-19": "Ekadashi"
-    };
+    "2083-7-4": "Ekadashi",
+    "2083-7-15": "Ashtami",
+    "2083-7-18": "Ekadashi",
+    "2083-8-5": "Ekadashi",
+    "2083-8-19": "Ekadashi",
+    "2083-9-4": "Ekadashi",
+    "2083-9-19": "Ekadashi",
+    "2083-10-5": "Ekadashi",
+    "2083-10-19": "Ekadashi",
+    "2083-11-19": "Ekadashi",
+    "2083-11-4": "Ekadashi"
+};
     /* DATA_END */
 
     // लोकलस्टोरेजमा सेभ भएको पुरानो डाटा तान्ने
@@ -255,6 +263,9 @@
 
     window.onload = () => { renderCalendar(currentYear, currentMonth); };
 </script>
+
+
+
 
 </body>
 </html>
