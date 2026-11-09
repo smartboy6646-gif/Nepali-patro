@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mero Patro</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Mero Patro">
+    <link rel="apple-touch-icon" href="applogo.PNG">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4A25E1">
+
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #eef2f5; }
+        .app-container { max-width: 480px; margin: 0 auto; background: #ffffff; min-height: 100vh; box-shadow: 0 0 10px rgba(0,0,0,0.1); padding-bottom: 20px;}
+        
+        .top-header { text-align: center; padding: 20px 15px; border-bottom: 2px solid #4A25E1; }
+        .logo-section { display: flex; justify-content: center; align-items: center; margin-bottom: 5px; }
+        .logo { width: 45px; height: 45px; border-radius: 10px; margin-right: 12px; object-fit: cover; border: 1px solid #ddd;}
+        .today-date { color: #4A25E1; font-size: 1.3rem; font-weight: bold; margin: 0;}
+        .today-eng { color: #666; font-size: 0.9rem; margin-top: 5px;}
+        
+        .month-nav { display: flex; justify-content: space-between; align-items: center; padding: 15px; }
+        .btn-nav { padding: 8px 15px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; color: #333; font-weight: bold;}
+        .month-title { text-align: center; }
+        .month-title h2 { margin: 0; font-size: 1.2rem; color: #222; }
+        .month-title span { font-size: 0.8rem; color: #777; }
+
+        .calendar-wrapper { padding: 0 10px; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); border-top: 1px solid #e0e0e0; border-left: 1px solid #e0e0e0; }
+        .day-name { text-align: center; padding: 10px 0; font-weight: bold; font-size: 0.9rem; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0; background: #fafafa;}
+        .day-name.saturday { color: #d32f2f; }
+        
+        .date-cell { padding: 5px; min-height: 65px; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0; text-align: center; display: flex; flex-direction: column; justify-content: space-between; position: relative;}
+        .date-cell.empty { background-color: #f5f5f5; }
+        
+        /* आजको मिति मार्क गर्ने डिजाइन */
+        .today-cell { border: 2px solid #e12525 !important; background-color: #fff4f4 !important; border-radius: 6px; box-shadow: inset 0 0 5px rgba(225,37,37,0.2);}
+        .today-label { position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%); background: #e12525; color: #fff; font-size: 0.5rem; padding: 2px 5px; border-radius: 4px; font-weight: bold;}
+
+        .date-top { display: flex; justify-content: space-between; padding: 0 2px;}
+        .nep-date { font-size: 1.2rem; font-weight: bold; color: #222; }
+        .nep-date.saturday { color: #d32f2f; }
+        .eng-date { font-size: 0.75rem; color: #888; margin-top: 4px;}
+        
+        .tithi { font-size: 0.65rem; color: #4A25E1; margin-top: auto; cursor: pointer; padding: 2px; min-height: 15px; border-radius: 3px;}
+        .tithi:hover { background-color: #e0dcf8; }
+
+        .action-section { padding: 20px 15px; text-align: center; }
+        .btn-export { background: #4A25E1; color: white; border: none; padding: 10px 20px; font-size: 1rem; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
+        .btn-export:hover { background: #3a1ca6; }
+        .help-text { font-size: 0.8rem; color: #666; margin-top: 8px; display: block;}
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="top-header">
+        <div class="logo-section">
+            <img src="https://via.placeholder.com/45/4A25E1/FFFFFF?text=Logo" alt="App Logo" class="logo" onerror="this.src='https://via.placeholder.com/45/4A25E1/FFFFFF?text=Logo'">
+            <h1 class="today-date" id="topTodayBS">आजको मिति: --</h1>
+        </div>
+        <div class="today-eng" id="topTodayAD">--</div>
+    </div>
+
+    <div class="month-nav">
+        <button class="btn-nav" onclick="changeMonth(-1)">« अघिल्लो</button>
+        <div class="month-title">
+            <h2 id="monthTitle">--</h2>
+            <span id="monthEngTitle">--</span>
+        </div>
+        <button class="btn-nav" onclick="changeMonth(1)">अर्को »</button>
+    </div>
+
+    <div class="calendar-wrapper">
+        <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+
+    <div class="action-section">
+        <button class="btn-export" onclick="downloadUpdatedCode()">💾 Save &amp; Get Code</button>
+        <span class="help-text">तिथि परिवर्तन गरेपछि यो बटन थिच्नुहोस्। यसले नयाँ तिथि सेभ भएको कोड फाइल डाउनलोड गर्छ, जुन अरुलाई पठाउन मिल्छ।</span>
+    </div>
+</div>
+
+<script>
+    const monthNames = ["वैशाख", "जेठ", "असार", "साउन", "भदौ", "असोज", "कात्तिक", "मंसिर", "पुष", "माघ", "फागुन", "चैत"];
+    const engMonthNames = ["Apr/May", "May/Jun", "Jun/Jul", "Jul/Aug", "Aug/Sep", "Sep/Oct", "Oct/Nov", "Nov/Dec", "Dec/Jan", "Jan/Feb", "Feb/Mar", "Mar/Apr"];
+    const nepaliNums = ['०','१','२','३','४','५','६','७','८','९'];
+
+    const calendarData = {
+        2082: { days: [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30] },
+        2083: { days: [31, 31, 32, 31, 31, 30, 30, 29, 30, 29, 30, 30] },
+        2084: { days: [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30] },
+        2085: { days: [31, 31, 32, 31, 31, 30, 30, 29, 30, 29, 30, 30] }
+    };
+
+    const anchorYear = 2083, anchorMonth = 7, anchorStartDay = 2; // मंसिर १ = मंगलबार
+
+    // आजको डाइनामिक मिति राख्नका लागि भेरिएबलहरू
+    let todayY, todayM, todayD;
+    let currentYear, currentMonth;
+    let lastCheckedDate = null;
+
+    /* DATA_START */
+    let tithiData = {
+        "2083-7-4": "Ekadashi",
+        "2083-7-15": "Ashtami",
+        "2083-7-18": "Ekadashi",
+        "2083-8-5": "Ekadashi",
+        "2083-8-19": "Ekadashi",
+        "2083-9-4": "Ekadashi",
+        "2083-9-19": "Ekadashi",
+        "2083-10-5": "Ekadashi",
+        "2083-10-19": "Ekadashi",
+        "2083-11-19": "Ekadashi",
+        "2083-11-4": "Ekadashi"
+    };
+    /* DATA_END */
+
+    // लोकलस्टोरेजमा सेभ भएको पुरानो डाटा तान्ने
+    let localData = localStorage.getItem('myTithiData');
+    if(localData) {
+        tithiData = { ...tithiData, ...JSON.parse(localData) };
+    }
+
+    // डिभाइसको real-time AD मितिबाट सही BS मिति पत्ता लगाउने फङ्क्सन
+    function updateTodayDate() {
+        const now = new Date();
+        lastCheckedDate = now.getDate();
+
+        // अंग्रेजी मिति (e.g. November 8, 2026)
+        const options = { month: 'long', day: 'numeric', year: 'numeric' };
+        const engDateStr = now.toLocaleDateString('en-US', options);
+
+        // AD देखि BS गणना (Anchor Date: Nov 17, 2026 AD = 2083 Mangsir 1 BS)
+        const todayAD = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const anchorAD = new Date(2026, 10, 17);
+        let diffDays = Math.round((todayAD - anchorAD) / (1000 * 60 * 60 * 24));
+
+        let curY = 2083, curM = 7, curD = 1;
+
+        if (diffDays >= 0) {
+            while (diffDays > 0) {
+                let daysInM = calendarData[curY] ? calendarData[curY].days[curM] : 30;
+                let rem = daysInM - curD + 1;
+                if (diffDays >= rem) {
+                    diffDays -= rem;
+                    curD = 1;
+                    curM++;
+                    if (curM > 11) { curM = 0; curY++; }
+                } else {
+                    curD += diffDays;
+                    diffDays = 0;
+                }
+            }
+        } else {
+            while (diffDays < 0) {
+                if (curD > 1) {
+                    let step = Math.min(-diffDays, curD - 1);
+                    curD -= step;
+                    diffDays += step;
+                } else {
+                    curM--;
+                    if (curM < 0) { curM = 11; curY--; }
+                    curD = calendarData[curY] ? calendarData[curY].days[curM] : 30;
+                    diffDays += 1;
+                }
+            }
+        }
+
+        todayY = curY;
+        todayM = curM;
+        todayD = curD;
+
+        // हेडरमा अपडेट गर्ने
+        document.getElementById('topTodayBS').innerText = `आजको मिति: ${monthNames[todayM]} ${convertToNep(todayD)}, ${convertToNep(todayY)}`;
+        document.getElementById('topTodayAD').innerText = engDateStr;
+    }
+
+    function getStartDay(targetYear, targetMonth) {
+        let daysDiff = 0;
+        if (targetYear > anchorYear || (targetYear === anchorYear && targetMonth > anchorMonth)) {
+            let y = anchorYear, m = anchorMonth;
+            while(y < targetYear || m < targetMonth) {
+                daysDiff += calendarData[y].days[m]; m++; if(m > 11) { m=0; y++; }
+            }
+            return (anchorStartDay + daysDiff) % 7;
+        } else {
+            let y = anchorYear, m = anchorMonth;
+            while(y > targetYear || m > targetMonth) {
+                m--; if(m < 0) { m=11; y--; }
+                daysDiff += calendarData[y].days[m];
+            }
+            return (anchorStartDay - (daysDiff % 7) + 7) % 7;
+        }
+    }
+
+    function getADDate(targetYear, targetMonth, targetDay) {
+        let daysDiff = 0;
+        if (targetYear > anchorYear || (targetYear === anchorYear && targetMonth > anchorMonth)) {
+            let y = anchorYear, m = anchorMonth;
+            while(y < targetYear || m < targetMonth) { daysDiff += calendarData[y].days[m]; m++; if(m > 11) { m=0; y++; } }
+        } else if (targetYear < anchorYear || (targetYear === anchorYear && targetMonth < anchorMonth)) {
+            let y = anchorYear, m = anchorMonth;
+            while(y > targetYear || m > targetMonth) { m--; if(m < 0) { m=11; y--; } daysDiff -= calendarData[y].days[m]; }
+        }
+        daysDiff += (targetDay - 1);
+        let resultDate = new Date(2026, 10, 17);
+        resultDate.setDate(resultDate.getDate() + daysDiff);
+        return resultDate.getDate();
+    }
+
+    function convertToNep(num) {
+        return num.toString().split('').map(n => nepaliNums[n]).join('');
+    }
+
+    function renderCalendar(year, month) {
+        if(!calendarData[year]) return; 
+
+        document.getElementById('monthTitle').innerText = `${monthNames[month]}, ${convertToNep(year)}`;
+        document.getElementById('monthEngTitle').innerText = engMonthNames[month];
+
+        const totalDays = calendarData[year].days[month];
+        const startDayIndex = getStartDay(year, month);
+        const grid = document.getElementById('calendarGrid');
+        let html = '<div class="day-name">आ</div><div class="day-name">सो</div><div class="day-name">मं</div><div class="day-name">बु</div><div class="day-name">बि</div><div class="day-name">शु</div><div class="day-name saturday">श</div>';
+
+        for(let i=0; i<startDayIndex; i++) html += `<div class="date-cell empty"></div>`;
+
+        for(let d=1; d<=totalDays; d++) {
+            const isSat = (startDayIndex + d - 1) % 7 === 6;
+            let nepNum = convertToNep(d);
+            let engNum = getADDate(year, month, d);
+            
+            // आजको मिति चेक गर्ने (Dynamic values सँग दाँज्ने)
+            let isToday = (year === todayY && month === todayM && d === todayD);
+            let cellClass = isToday ? "date-cell today-cell" : "date-cell";
+            let todayBadge = isToday ? `<div class="today-label">आज</div>` : "";
+
+            let key = `${year}-${month}-${d}`;
+            let tithiText = tithiData[key] || "";
+
+            html += `
+                <div class="${cellClass}">
+                    ${todayBadge}
+                    <div class="date-top">
+                        <span class="nep-date ${isSat ? 'saturday' : ''}">${nepNum}</span>
+                        <span class="eng-date">${engNum}</span>
+                    </div>
+                    <div class="tithi" onclick="editTithi(${year}, ${month}, ${d}, this)">${tithiText}</div>
+                </div>
+            `;
+        }
+        
+        const extraCells = (startDayIndex + totalDays) % 7 === 0 ? 0 : 7 - ((startDayIndex + totalDays) % 7);
+        for(let i=0; i<extraCells; i++) html += `<div class="date-cell empty"></div>`;
+
+        grid.innerHTML = html;
+    }
+
+    function changeMonth(direction) {
+        currentMonth += direction;
+        if (currentMonth > 11) { currentMonth = 0; currentYear++; } 
+        else if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+        renderCalendar(currentYear, currentMonth);
+    }
+
+    function editTithi(year, month, day, element) {
+        let key = `${year}-${month}-${day}`;
+        let current = tithiData[key] || "";
+        let newVal = prompt(monthNames[month] + " " + convertToNep(day) + " को तिथि थप्नुहोस् (हटाउन खाली छोडेर OK थिच्नुहोस्):", current);
+        
+        if (newVal !== null) {
+            if(newVal.trim() === "") {
+                delete tithiData[key];
+                element.innerText = "";
+            } else {
+                tithiData[key] = newVal.trim();
+                element.innerText = newVal.trim();
+            }
+            localStorage.setItem('myTithiData', JSON.stringify(tithiData));
+        }
+    }
+
+    function downloadUpdatedCode() {
+        let grid = document.getElementById('calendarGrid');
+        let tempHTML = grid.innerHTML;
+        grid.innerHTML = ""; 
+
+        let fullHTML = "<!DOCTYPE html>\n<html lang=\"ne\">\n" + document.documentElement.innerHTML + "\n</html>";
+        
+        let newDataString = "let tithiData = " + JSON.stringify(tithiData, null, 4) + ";";
+        fullHTML = fullHTML.replace(/\/\* DATA_START \*\/([\s\S]*?)\/\* DATA_END \*\//, "/* DATA_START */\n    " + newDataString + "\n    /* DATA_END */");
+
+        grid.innerHTML = tempHTML; 
+
+        let blob = new Blob([fullHTML], { type: 'text/html' });
+        let a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'MeroPatro_Updated.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        
+        alert("नयाँ तिथिहरू कोडमै सेभ भएर 'MeroPatro_Updated.html' डाउनलोड भयो! अब यो फाइल अरुलाई पठाउन सक्नुहुन्छ।");
+    }
+
+    // रातिको १२ बजे (वा दिन परिवर्तन हुँदा) क्यालेन्डर टोटोमेटिक अपडेट गर्ने लुप
+    function startMidnightListener() {
+        setInterval(() => {
+            const now = new Date();
+            if (lastCheckedDate !== null && now.getDate() !== lastCheckedDate) {
+                updateTodayDate();
+                renderCalendar(currentYear, currentMonth);
+            }
+        }, 10000); // हरेक १० सेकेन्डमा चेक गर्छ
+    }
+
+    window.onload = () => { 
+        updateTodayDate(); 
+        currentYear = todayY;
+        currentMonth = todayM;
+        renderCalendar(currentYear, currentMonth);
+        startMidnightListener();
+    };
+</script>
+
+</body>
+</html>
